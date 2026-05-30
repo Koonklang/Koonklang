@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WM Claen | ระบบรายงานเวร</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sarabun:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="index.css">
+</head>
+
+<body class="dark-theme">
+
+    <!-- 1. SPLASH SCREEN (INTRO) -->
+    <div id="splash-screen" class="splash-container">
+        <div class="splash-content">
+            <div class="logo-wrapper">
+                <div class="logo-glow"></div>
+                <div class="logo-icon-container">
+                    <svg class="shield-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        <path class="logo-check" d="M9 11l2 2 4-4" />
+                    </svg>
+                </div>
+            </div>
+            <h1 class="splash-title">MW Clean <span class="accent-text">TNP</span></h1>
+            <p class="splash-subtitle">ระบบรายงานเวร วงโยธวาทิตโรงเรียนมุกดาวิทยานุกูล</p>
+            <div class="tap-indicator">
+                <i data-lucide="mouse-pointer-click"></i>
+                <span>Enter ....</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER -->
+    <div id="app-wrapper" class="app-hidden">
+
+        <!-- 2. AUTH SECTION -->
+        <div id="auth-section" class="auth-container section-hidden">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <div class="mini-logo">
+                        <i data-lucide="shield-check"></i>
+                        <span>MW Clean</span>
+                    </div>
+                    <h2 id="auth-title">ยินดีต้อนรับสู่ระบบ</h2>
+                    <p id="auth-subtitle" class="text-secondary">กรุณาเข้าสู่ระบบเพื่อรายงานเวร</p>
+                </div>
+
+                <!-- Tabs to switch between Login and Register -->
+                <div class="auth-tabs">
+                    <button id="tab-login" class="auth-tab active" onclick="switchAuthTab('login')">เข้าสู่ระบบ</button>
+                    <button id="tab-register" class="auth-tab" onclick="switchAuthTab('register')">สมัครสมาชิก</button>
+                </div>
+
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-email"><i data-lucide="mail"></i> อีเมล</label>
+                        <input type="email" id="login-email" required placeholder="example@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password"><i data-lucide="lock"></i> รหัสผ่าน</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="login-password" required placeholder="••••••••">
+                            <button type="button" class="btn-toggle-password"
+                                onclick="togglePasswordVisibility('login-password')">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-actions-row">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="remember-me">
+                            <span class="checkmark"></span>
+                            จดจำการเข้าสู่ระบบ
+                        </label>
+                        <a href="#" class="forgot-pass-link"
+                            onclick="alert('กรุณาติดต่อแอดมินเพื่อรีเซ็ตรหัสผ่าน')">ลืมรหัสผ่าน?</a>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-block">
+                        <span>เข้าสู่ระบบ</span>
+                        <i data-lucide="arrow-right"></i>
+                    </button>
+                </form>
+
+                <!-- Register Form (Initially Hidden) -->
+                <form id="register-form" class="auth-form form-hidden" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="reg-name"><i data-lucide="user"></i> ชื่อ-นามสกุล</label>
+                        <input type="text" id="reg-name" required placeholder="นายสมศรี จันทร์พุธ">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-email"><i data-lucide="mail"></i> อีเมล</label>
+                        <input type="email" id="reg-email" required placeholder="somchai@gmail.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="reg-password"><i data-lucide="lock"></i> กำหนดรหัสผ่าน</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="reg-password" required placeholder="ขั้นต่ำ 6 ตัวอักษร"
+                                minlength="6">
+                            <button type="button" class="btn-toggle-password"
+                                onclick="togglePasswordVisibility('reg-password')">
+                                <i data-lucide="eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label><i data-lucide="shield"></i> บทบาทผู้ใช้งาน (Role)</label>
+                        <div class="role-selector-group">
+                            <label class="role-radio-card">
+                                <input type="radio" name="reg-role" value="member" checked>
+                                <div class="role-card-content">
+                                    <i data-lucide="user-cog"></i>
+                                    <span>สมาชิกในวง (Member)</span>
+                                </div>
+                            </label>
+                            <label class="role-radio-card">
+                                <input type="radio" name="reg-role" value="admin">
+                                <div class="role-card-content">
+                                    <i data-lucide="shield-alert"></i>
+                                    <span>สภาวง (DEVELOPER)</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-secondary btn-block">
+                        <span>สร้างบัญชีสมาชิก</span>
+                        <i data-lucide="user-plus"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- 3. MAIN DASHBOARD SECTION -->
+        <div id="main-dashboard" class="dashboard-layout section-hidden">
+
+            <!-- Sidebar (Desktop Navigation) -->
+            <aside class="sidebar">
+                <div class="sidebar-brand">
+                    <div class="logo-wrapper mini">
+                        <svg class="shield-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="1.5">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                        </svg>
+                    </div>
+                    <div class="brand-text">
+                        <h3>WM Clean</h3>
+                        <span class="badge badge-success">v2.0 </span>
+                    </div>
+                </div>
+
+                <div class="user-profile-summary">
+                    <div class="avatar-container" id="sidebar-avatar">ส</div>
+                    <div class="user-summary-info">
+                        <h4 id="sidebar-username">กำลังโหลด...</h4>
+                        <span id="sidebar-userrole" class="user-role-badge">เจ้าหน้าที่</span>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <ul>
+                        <li>
+                            <a href="#" class="nav-item active" data-tab="tab-feed" onclick="switchMainTab('tab-feed')">
+                                <i data-lucide="layout-grid"></i>
+                                <span>หน้าแรกและรายการเวร</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-tab="tab-new-report"
+                                onclick="switchMainTab('tab-new-report')">
+                                <i data-lucide="file-plus-2"></i>
+                                <span>รายงานเวรใหม่</span>
+                            </a>
+                        </li>
+                        <li id="nav-admin-only" class="admin-only-item hidden">
+                            <a href="#" class="nav-item" data-tab="tab-admin-console"
+                                onclick="switchMainTab('tab-admin-console')">
+                                <i data-lucide="sliders"></i>
+                                <span>แผงผู้ดูแลระบบ</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="nav-item" data-tab="tab-profile" onclick="switchMainTab('tab-profile')">
+                                <i data-lucide="user"></i>
+                                <span>โปรไฟล์ของฉัน</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <button class="btn btn-outline btn-block btn-logout" onclick="handleLogout()">
+                        <i data-lucide="log-out"></i>
+                        <span>ออกจากระบบ</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Workspace Container -->
+            <main class="workspace-container">
+
+                <!-- Sticky Top Header (Mobile & PC Header) -->
+                <header class="top-header">
+                    <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">
+                        <i data-lucide="menu"></i>
+                    </button>
+
+                    <h2 id="current-panel-title">รายการรายงานเวร</h2>
+
+                    <div class="header-actions">
+                        <div class="live-clock">
+                            <i data-lucide="clock"></i>
+                            <span id="live-time-display">00:00:00</span>
+                        </div>
+                        <button class="theme-toggle-btn" onclick="toggleTheme()" title="สลับธีม สว่าง/มืด">
+                            <i data-lucide="sun"></i>
+                        </button>
+                    </div>
+                </header>
+
+                <!-- WORKSPACE CONTENT AREA -->
+                <div class="workspace-content">
+
+                    <!-- PANEL A: REPORT FEED (หน้าแรกและรายการเวร) -->
+                    <div id="panel-feed" class="workspace-panel">
+
+                        <!-- Dashboard Stats Quick Summary Cards -->
+                        <section class="stats-grid">
+                            <div class="stat-card blue-glow">
+                                <div class="stat-icon"><i data-lucide="clipboard-list"></i></div>
+                                <div class="stat-info">
+                                    <h3 id="stat-total">0</h3>
+                                    <p>รายงานเวรทั้งหมด</p>
+                                </div>
+                            </div>
+                            <div class="stat-card red-glow">
+                                <div class="stat-icon"><i data-lucide="alert-octagon"></i></div>
+                                <div class="stat-info">
+                                    <h3 id="stat-urgent">0</h3>
+                                    <p>มีสิ่งผิดปกติ</p>
+                                </div>
+                            </div>
+                            <div class="stat-card amber-glow">
+                                <div class="stat-icon"><i data-lucide="clock-3"></i></div>
+                                <div class="stat-info">
+                                    <h3 id="stat-pending">0</h3>
+                                    <p>รอตรวจสอบ</p>
+                                </div>
+                            </div>
+                            <div class="stat-card green-glow">
+                                <div class="stat-icon"><i data-lucide="check-circle2"></i></div>
+                                <div class="stat-info">
+                                    <h3 id="stat-resolved">0</h3>
+                                    <p>ตรวจสอบเรียบร้อย</p>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Search and Custom Filtering Section -->
+                        <section class="filter-section">
+                            <div class="search-box-wrapper">
+                                <i data-lucide="search"></i>
+                                <input type="text" id="search-input"
+                                    placeholder="ค้นหาตามชื่อผู้รายงาน, สถานที่, หัวข้อ หรือรายละเอียด..."
+                                    oninput="filterReports()">
+                            </div>
+
+                            <div class="filter-actions-bar">
+                                <button class="btn btn-outline" id="btn-toggle-filters" onclick="toggleFilterDrawer()">
+                                    <i data-lucide="filter"></i>
+                                    <span>ตัวกรองขั้นสูง</span>
+                                    <span class="badge badge-accent" id="filter-active-count">0</span>
+                                </button>
+
+                                <button class="btn btn-primary" onclick="switchMainTab('tab-new-report')">
+                                    <i data-lucide="plus"></i>
+                                    <span>เขียนรายงานเวร</span>
+                                </button>
+                            </div>
+
+                            <!-- Drawer Panel for Advanced Filters (Collapsed by Default) -->
+                            <div id="filter-drawer" class="filter-drawer hidden">
+                                <div class="filter-grid">
+                                    <div class="filter-col">
+                                        <label for="filter-category">หมวดหมู่</label>
+                                        <select id="filter-category" onchange="filterReports()">
+                                            <option value="all">ห้องดนตรี</option>
+
+                                        </select>
+                                    </div>
+
+                                    <div class="filter-col">
+                                        <label for="filter-urgency">ช่วงเวลาที่ทำเวร</label>
+                                        <select id="filter-urgency" onchange="filterReports()">
+                                            <option value="normal"> 07:00</option>
+                                            <option value="warning"> 12:00</option>
+                                            <option value="urgent"> 16:00 - 18:00</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="filter-col">
+                                        <label for="filter-status">สถานะอนุมัติ</label>
+                                        <select id="filter-status" onchange="filterReports()">
+                                            <option value="pending">รอการตรวจเวร (Pending)</option>
+                                            <option value="approved">ได้รับการอนุมัติการตรวจเวร (Approved)</option>
+                                            <option value="rejected">มีปัญหารอดำเนินการ (Rejected)</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="filter-col">
+                                        <label for="filter-date">วันที่ทำเวร</label>
+                                        <select id="filter-date" onchange="filterReports()">
+                                            <option value="all">ทั้งหมด</option>
+                                            <option value="today">วันนี้</option>
+                                            <option value="yesterday">เมื่อวานนี้</option>
+                                            <option value="week">สัปดาห์นี้</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="filter-drawer-actions">
+                                    <button class="btn btn-text text-danger"
+                                        onclick="resetAllFilters()">ล้างตัวกรองทั้งหมด</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- Empty State UI -->
+                        <div id="no-reports-ui" class="empty-state hidden">
+                            <i data-lucide="clipboard-x"></i>
+                            <h3>ไม่พบรายงานเวรที่ค้นหา</h3>
+                            <p class="text-secondary">ลองปรับเปลี่ยนเงื่อนไขการกรอง หรือเพิ่มรายงานเวรใหม่ในระบบ</p>
+                            <button class="btn btn-outline" onclick="resetAllFilters()">ล้างตัวกรองทั้งหมด</button>
+                        </div>
+
+                        <!-- Reports Cards Grid -->
+                        <div id="reports-feed-grid" class="reports-grid">
+                            <!-- Javascript will inject reports here dynamically -->
+                        </div>
+
+                    </div>
+
+                    <!-- PANEL B: NEW REPORT FORM (เขียนรายงานเวรใหม่) -->
+                    <div id="panel-new-report" class="workspace-panel panel-hidden">
+                        <div class="card form-max-width">
+                            <div class="panel-card-header">
+                                <h3>กรอกรายละเอียดการรายงานเวร</h3>
+                                <p class="text-secondary">
+                                    กรุณากรอกข้อมูลและแนบภาพหลักฐานให้ถูกต้องครบถ้วนเพื่อประโยชน์ในการตรวจสอบ</p>
+                            </div>
+
+                            <form id="report-submission-form" onsubmit="handleNewReportSubmit(event)">
+                                <div class="form-grid-2">
+                                    <!-- Category Selection -->
+                                    <div class="form-group">
+                                        <label for="rep-category"><i data-lucide="tag"></i> หมวดหมู่ประเภทเวร</label>
+                                        <select id="rep-category" required>
+                                            <option value="" disabled selected>เลือกหมวดหมู่...</option>
+                                            <option value="security">เก็บขยะ</option>
+                                            <option value="it">ทำความสะอาด</option>
+                                            <option value="maintenance">จัดของในห้อง</option>
+                                            <option value="general">ตรวจอาคาร</option>
+                                        </select>
+                                    </div>
+
+                                    <!-- Urgency Level Option Group -->
+                                    <div class="form-group">
+                                        <label><i data-lucide="alert-triangle"></i> ช่วงเวลาที่ทำเวร</label>
+                                        <div class="urgency-radio-group">
+                                            <label class="urgency-option-label label-normal">
+                                                <input type="radio" name="rep-urgency" value="normal" checked>
+                                                <span> 07:00</span>
+                                            </label>
+                                            <label class="urgency-option-label label-warning">
+                                                <input type="radio" name="rep-urgency" value="warning">
+                                                <span> 12:00</span>
+                                            </label>
+                                            <label class="urgency-option-label label-urgent">
+                                                <input type="radio" name="rep-urgency" value="urgent">
+                                                <span> 16:00 -</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-grid-2">
+                                    <!-- Title of Report -->
+                                    <div class="form-group">
+                                        <label for="rep-title"><i data-lucide="edit-3"></i> หัวข้อการตรวจเวร</label>
+                                        <input type="text" id="rep-title" required
+                                            placeholder="เช่น ตรวจเวรยามตึก A รอบดึก, ตรวจเช็คห้อง Server ประจำชั่วโมง">
+                                    </div>
+
+                                    <!-- Location of Incident/Checkpoint -->
+                                    <div class="form-group">
+                                        <label for="rep-location"><i data-lucide="map-pin"></i> จุดตรวจ/สถานที่</label>
+                                        <input type="text" id="rep-location" required
+                                            placeholder="เช่น อาคาร A ชั้น 3, ประตูหน้าสำนักงาน">
+                                    </div>
+                                </div>
+
+                                <!-- IMAGE UPLOADER -->
+                                <div class="form-group">
+                                    <label><i data-lucide="image"></i> ภาพถ่ายประกอบรายงานเวร <span
+                                            class="required-text">*</span></label>
+                                    <div id="image-drag-area" class="image-upload-zone" onclick="triggerImageInput()">
+                                        <input type="file" id="rep-image-file" accept="image/*" class="hidden"
+                                            onchange="previewSelectedImage(event)" required>
+                                        <div class="upload-zone-content" id="upload-prompt">
+                                            <i data-lucide="camera" class="upload-icon"></i>
+                                            <h4>คลิก หรือ ลากไฟล์รูปภาพมาวางที่นี่เพื่ออัปโหลด</h4>
+                                            <p class="text-secondary text-xs">รองรับไฟล์ภาพ JPEG, PNG ขนาดไม่เกิน 5MB
+                                            </p>
+                                        </div>
+                                        <div class="image-preview-container hidden" id="upload-preview-wrapper">
+                                            <img id="upload-preview-image" src="" alt="ภาพตัวอย่าง">
+                                            <button type="button" class="btn-clear-preview"
+                                                onclick="clearUploadedImage(event)" title="ลบภาพนี้">
+                                                <i data-lucide="x"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <!-- Quick camera simulator button for testing convenience -->
+                                    <div class="simulated-actions">
+                                        <button type="button" class="btn btn-text text-accent btn-xs"
+                                            onclick="useSampleReportPhoto()">
+                                            <i data-lucide="sparkles"></i> จำลองภาพประกอบรายงานเวรอัตโนมัติ
+                                            (เพื่อการทดสอบ)
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- QUICK TEMPLATES FOR CONVENIENCE -->
+                                <div class="form-group">
+                                    <label><i data-lucide="zap"></i> ฟังก์ชันอำนวยความสะดวก: ข้อความรายงานด่วน (Quick
+                                        Templates)</label>
+                                    <p class="text-secondary text-xs mb-2">
+                                        คลิกเพื่อใช้ข้อความบันทึกยอดนิยมลงในรายละเอียดของรายงานทันที</p>
+                                    <div class="quick-templates-box">
+                                        <button type="button" class="tag-btn" onclick="applyQuickTemplate('ปกติ')">✅
+                                            ตรวจเช็คแล้ว เหตุการณ์ปกติเรียบร้อย</button>
+                                        <button type="button" class="tag-btn"
+                                            onclick="applyQuickTemplate('ซ่อมบำรุง')">🛠️ ตรวจเช็คพบอุปกรณ์ชำรุดเสียหาย
+                                            แจ้งช่างให้ดำเนินการแล้ว</button>
+                                        <button type="button" class="tag-btn"
+                                            onclick="applyQuickTemplate('ความปลอดภัย')">🚨 พบบุคคลภายนอกน่าสงสัย
+                                            ได้เข้าไปสอบถามและชี้แจงพื้นที่แล้ว</button>
+                                        <button type="button" class="tag-btn" onclick="applyQuickTemplate('ไอที')">💻
+                                            ตรวจพบสัญญาณอินเทอร์เน็ตหลุด ได้รีบูตอุปกรณ์กระจายสัญญาณแล้ว</button>
+                                        <button type="button" class="tag-btn"
+                                            onclick="applyQuickTemplate('ความสะอาด')">🧹
+                                            ตรวจเช็คความสะอาดรอบบริเวณเสร็จสิ้น สะอาดเรียบร้อยดี</button>
+                                    </div>
+                                </div>
+
+                                <!-- Report Description -->
+                                <div class="form-group">
+                                    <label for="rep-description"><i data-lucide="align-left"></i>
+                                        รายละเอียดบันทึกการรายงานเวร</label>
+                                    <textarea id="rep-description" rows="4" required
+                                        placeholder="ระบุสิ่งที่พบเจอปัญหา แนวทางการแก้ไข หรือรายละเอียดการตรวจสอบอย่างครอบคลุม..."></textarea>
+                                </div>
+
+                                <!-- Submit Button and cancel -->
+                                <div class="form-submit-buttons">
+                                    <button type="button" class="btn btn-outline"
+                                        onclick="switchMainTab('tab-feed')">ยกเลิก</button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i data-lucide="send"></i>
+                                        <span>ส่งบันทึกรายงานเวร</span>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <!-- PANEL C: ADMIN CONSOLE (แผงควบคุมแอดมิน - เฉพาะแอดมินเท่านั้น) -->
+                    <div id="panel-admin-console" class="workspace-panel panel-hidden">
+
+                        <!-- Panel Row: Statistics & Account Creation -->
+                        <div class="admin-split-layout">
+
+                            <!-- Left: Create User Account directly -->
+                            <div class="card">
+                                <div class="panel-card-header">
+                                    <h3><i data-lucide="user-plus"></i> เพิ่มบัญชีสมาชิกวงใหม่</h3>
+                                    <p class="text-secondary text-xs">
+                                        แอดมินสามารถสมัครบัญชีให้กับสมาชิกภายในทีมได้จากตรงนี้</p>
+                                </div>
+                                <form id="admin-create-user-form" onsubmit="handleAdminCreateUser(event)">
+                                    <div class="form-group">
+                                        <label for="admin-user-name">ชื่อ-นามสกุลสมาชิก</label>
+                                        <input type="text" id="admin-user-name" required
+                                            placeholder="เช่น นายประหยัด สมหวัง">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="admin-user-email">อีเมลเข้าใช้งาน</label>
+                                        <input type="email" id="admin-user-email" required
+                                            placeholder="prayad@gmail.com">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="admin-user-pass">รหัสผ่านเริ่มต้น</label>
+                                        <input type="password" id="admin-user-pass" required
+                                            placeholder="อย่างน้อย 6 หลัก" minlength="6">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="admin-user-role">ตำแหน่ง / บทบาท</label>
+                                        <select id="admin-user-role" required>
+                                            <option value="member" selected>สมาชิกในวง (Member)</option>
+                                            <option value="admin">สภาวง (Admin)</option>
+                                        </select>
+                                    </div>
+                                    <button type="submit" class="btn btn-secondary btn-block">
+                                        <i data-lucide="save"></i>
+                                        <span>บันทึกบัญชีสมาชิกใหม่</span>
+                                    </button>
+                                </form>
+                            </div>
+
+                            <!-- Right: Users Database Info List -->
+                            <div class="card">
+                                <div class="panel-card-header flex-header">
+                                    <div>
+                                        <h3><i data-lucide="users"></i> รายชื่อสมาชิกในระบบ</h3>
+                                        <p class="text-secondary text-xs">
+                                            รายชื่อและบทบาทของผู้ใช้งานทั้งหมดที่ลงทะเบียนไว้</p>
+                                    </div>
+                                    <span class="badge badge-primary" id="admin-total-users-badge">0 คน</span>
+                                </div>
+
+                                <div class="admin-users-list-wrapper">
+                                    <table class="table-modern">
+                                        <thead>
+                                            <tr>
+                                                <th>สมาชิก</th>
+                                                <th>อีเมล</th>
+                                                <th>ตำแหน่ง</th>
+                                                <th>จัดการ</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="admin-users-table-body">
+                                            <!-- Dynamic rows injected by JS -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- PANEL D: USER PROFILE (โปรไฟล์ส่วนตัว) -->
+                    <div id="panel-profile" class="workspace-panel panel-hidden">
+                        <div class="profile-card-container">
+
+                            <!-- Profile header badge card -->
+                            <div class="card profile-main-card">
+                                <div class="profile-header-visual">
+                                    <div class="avatar-large" id="profile-avatar-char">ส</div>
+                                    <div class="profile-title-block">
+                                        <h2 id="profile-full-name">กำลังโหลดข้อมูล...</h2>
+                                        <p id="profile-email" class="text-secondary">email@gmail.com</p>
+                                        <span id="profile-role-badge" class="badge">สมาชิกในวง</span>
+                                    </div>
+                                </div>
+
+                                <div class="profile-stats-dashboard">
+                                    <div class="profile-stat-item">
+                                        <h4 id="profile-stat-reports-count">0</h4>
+                                        <span>ส่งรายงานเวรแล้ว</span>
+                                    </div>
+                                    <div class="profile-stat-item">
+                                        <h4 id="profile-stat-register-date">31 พ.ค. 2026</h4>
+                                        <span>วันที่เข้าร่วมระบบ</span>
+                                    </div>
+                                    <div class="profile-stat-item">
+                                        <h4 id="profile-stat-last-login">วันนี้</h4>
+                                        <span>ล็อกอินล่าสุด</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- App utilities & Settings -->
+                            <div class="card">
+                                <div class="panel-card-header">
+                                    <h3><i data-lucide="settings"></i> การตั้งค่าเว็บระบบรายงานเวร</h3>
+                                    <p class="text-secondary text-xs">
+                                        จัดการรายละเอียดแอปพลิเคชันและการแสดงผลความปลอดภัยของคุณ</p>
+                                </div>
+                                <div class="settings-list">
+                                    <div class="setting-row">
+                                        <div class="setting-desc">
+                                            <h4>สลับโหมดการแสดงผล (Theme)</h4>
+                                            <p class="text-secondary text-xs">เลือกธีมกลางวัน (Light) หรือ ธีมกลางคืน
+                                                (Dark) ในการทำงาน</p>
+                                        </div>
+                                        <button class="btn btn-outline btn-xs" onclick="toggleTheme()">
+                                            <i data-lucide="sun-moon"></i> สลับโหมด
+                                        </button>
+                                    </div>
+
+                                    <div class="setting-row">
+                                        <div class="setting-desc">
+                                            <h4>ล้างแคชและรีเซ็ตข้อมูลระบบจำลอง</h4>
+                                            <p class="text-secondary text-xs">
+                                                ล้างฐานข้อมูลการจัดเก็บในเครื่องทั้งหมดและโหลดข้อมูลตัวอย่างเริ่มต้นใหม่
+                                            </p>
+                                        </div>
+                                        <button class="btn btn-outline text-danger btn-xs"
+                                            onclick="resetDatabaseToDefault()">
+                                            <i data-lucide="refresh-cw"></i> รีเซ็ตฐานข้อมูล
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="profile-actions-row">
+                                    <button class="btn btn-outline text-danger btn-block" onclick="handleLogout()">
+                                        <i data-lucide="log-out"></i>
+                                        <span>ออกจากระบบ (Logout)</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+            </main>
+        </div>
+
+        <!-- 4. BOTTOM NAV (Mobile Only Navigation Layout) -->
+        <nav class="mobile-bottom-nav">
+            <a href="#" class="mobile-nav-item active" data-tab="tab-feed" onclick="switchMainTab('tab-feed')">
+                <i data-lucide="layout-grid"></i>
+                <span>หน้าหลัก</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-tab="tab-new-report" onclick="switchMainTab('tab-new-report')">
+                <div class="special-nav-circle">
+                    <i data-lucide="plus"></i>
+                </div>
+                <span>เขียนเวร</span>
+            </a>
+            <a href="#" id="mobile-nav-admin-only" class="mobile-nav-item hidden" data-tab="tab-admin-console"
+                onclick="switchMainTab('tab-admin-console')">
+                <i data-lucide="sliders"></i>
+                <span>แอดมิน</span>
+            </a>
+            <a href="#" class="mobile-nav-item" data-tab="tab-profile" onclick="switchMainTab('tab-profile')">
+                <i data-lucide="user"></i>
+                <span>โปรไฟล์</span>
+            </a>
+        </nav>
+
+    </div>
+
+    <!-- 5. LIGHTBOX MODAL FOR EXPANDED REPORT PHOTOS -->
+    <div id="image-lightbox" class="lightbox-modal hidden" onclick="closeLightbox()">
+        <span class="close-lightbox-btn">&times;</span>
+        <img class="lightbox-content" id="lightbox-expanded-img" src="" alt="ขยายรูปภาพ">
+        <div id="lightbox-caption" class="lightbox-caption">คำอธิบายภาพเวร</div>
+    </div>
+
+    <!-- Custom JavaScript -->
+    <script src="app.js"></script>
+</body>
+
+</html>
